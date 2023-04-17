@@ -1,0 +1,25 @@
+version: '3'
+services:
+  backend:
+   image: 'node:latest'
+   build: .
+   ports: 
+    - 3000:3000
+   depends_on: 
+    - redis
+   networks:
+    - backend-redis
+   container_name: backend
+
+  redis: 
+   image: 'bitnami/redis:latest'
+   networks:
+    - backend-redis
+   container_name: redis
+   environment:
+    - ALLOW_EMPTY_PASSWORD=yes
+
+networks:
+  backend-redis:
+   driver: bridge
+  
