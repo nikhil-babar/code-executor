@@ -1,16 +1,16 @@
 const BullQueue = require('bull')
 const Queue = new BullQueue('code-executor', {
     redis: {
-        host: 'redis',
+        host: 'localhost',
         port: 6379
     }
 })
-const { executeCode: executeJava } = require('./services/javaCode')
-const { executeCode: executePython } = require('./services/pythonCode')
+const { executeCode: execCompiledLanguage } = require('./services/compileLang')
+const { executeCode: execInterpretatedLanguage } = require('./services/interpretedLang')
 const JobDB = require('./models/Job')
 
-Queue.process('java', (Job) => executeJava(Job.data))
-Queue.process('python', (Job) => executePython(Job.data))
+Queue.process('compiled_language', (Job) => execCompiledLanguage(Job.data))
+Queue.process('interpreted_language', (Job) => execInterpretatedLanguage(Job.data))
 
 Queue.on('completed', async (Job) => {
     try {
@@ -28,11 +28,11 @@ Queue.on('completed', async (Job) => {
 
 Queue.on('failed', async (Job) => {
     try {
-        console.log("Error in queue")
+        console.log("Error in queue", Job.stacktrace)
 
         await JobDB.findByIdAndUpdate(Job.data._id, {
             error: {
-                stack: Job.stacktrace.toString(),
+                stack: Job.data,
                 message: Job.name
             },
             status: 'failed'
@@ -42,5 +42,7 @@ Queue.on('failed', async (Job) => {
         console.log(error.message)
     }
 })
+
+Queue.on('error', (err) => console.log(err.message))
 
 module.exports = Queue

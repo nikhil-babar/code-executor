@@ -14,24 +14,26 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['java', 'cpp', 'python']
-        
     },
     output: {
-        stdout:{
+        stdout: {
             type: String,
         },
-        stderr:{
+        stderr: {
             type: String,
         }
     },
     error: {
-        stack:{
+        stack: {
             type: String,
         },
-        message:{
+        message: {
             type: String,
         }
     },
+    input: {
+        type: String
+    }
 }, {
     timestamps: true,
 })

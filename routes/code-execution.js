@@ -6,18 +6,35 @@ require('dotenv').config()
 
 router.post('/', async (req, res) => {
     try {
-        const { lang, code } = req.body
+        const { lang, code, input } = req.body
 
         const job = new Job({
             lang,
             code,
+            input,
             status: 'pending',
         })
         await job.save()
 
         res.status(201).json(job)
 
-        Queue.add(lang, job)
+        let jobtype = ''
+
+        switch (lang) {
+            case 'java':
+            case 'cpp':
+            case 'c':
+                jobtype = 'compiled_language'
+                break;
+
+            default:
+                jobtype = 'interpreted_language'
+                break;
+        }
+
+        console.log(jobtype, code, input, lang)
+
+        Queue.add(jobtype, job)
 
     } catch (error) {
         console.log(error.message)
@@ -38,10 +55,8 @@ router.get('/', async (req, res) => {
 
         const job = await Job.findById(id)
 
-        console.log(job)
-
         if (!job || job.status === 'pending') {
-            return res.sendStatus(400)
+            return res.sendStatus(404)
         }
 
         res.status(200).json(job)

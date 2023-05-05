@@ -8,13 +8,16 @@ ENV PYTHON_VERSION 3.8
 ENV PYTHON_PATH /usr/bin/python3.8
 
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH $JAVA_HOME/bin:$PATH
+ENV JAVA_PATH $JAVA_HOME/bin:$PATH
+
+RUN apt-get update && apt-get install -y gcc g++
+ENV PATH="/usr/bin:${PATH}"
 
 WORKDIR /src
 
 COPY package.json package-lock.json ./
 
-EXPOSE 3000
+EXPOSE 5000
 
 RUN npm install
 
