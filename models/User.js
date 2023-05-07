@@ -10,9 +10,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    picture: {
-        type: String
-    }
+    avatar: {
+        type: String,
+        required: true
+    },
+    github_username: {
+        type: String,
+        unique: true
+    },
 });
 
 const User = mongoose.model('User', userSchema);

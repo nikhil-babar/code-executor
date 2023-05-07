@@ -7,6 +7,7 @@ const Redis = require('ioredis').default
 const cors = require('cors')
 const codeExecutor = require('./routes/code-execution')
 const authProvider = require('./routes/auth')
+const githubProvider = require('./routes/github')
 require('dotenv').config()
 
 const redisClient = new Redis({
@@ -24,15 +25,17 @@ const RedisStore = new connectRedis({
 })
 
 app.use(cors({
-    origin: 'http://localhost:3000'
+    origin: 'http://localhost:3000',
+    credentials: true
 }))
 
 app.use(
     session({
-      store: RedisStore,
-      resave: false, 
-      saveUninitialized: false, 
-      secret: process.env.SESSION_SECRET,
+        store: RedisStore,
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.SESSION_SECRET,
+        cookie: { httpOnly: true }
     })
 )
 
@@ -46,5 +49,6 @@ mongoose.connect(process.env.DATABASE_URL, {
 app.use(express.json())
 app.use('/code-execution', codeExecutor)
 app.use('/auth', authProvider)
+app.use('/github', githubProvider)
 
 app.listen(5000, () => console.log('server on port 5000'))

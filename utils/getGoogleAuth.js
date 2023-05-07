@@ -1,35 +1,35 @@
 const { default: axios } = require('axios')
-const { URL, URLSearchParams } = require('url')
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-
-module.exports = async function getGoogleAuth({ code }) {
+module.exports.getAccessToken = async ({ grant_type, options }) => {
     try {
-        const baseUrl = new URL(process.env.TOKEN_URI)
-
-        const options = {
-            grant_type: 'authorization_code',
-            redirect_uri: process.env.REDIRECT_URI,
-            client_secret: process.env.CLIENT_SECRET,
-            client_id: process.env.CLIENT_ID,
-            code
-        }
-
-        const params = new URLSearchParams()
-        Object.entries(options).forEach(([key, value]) => params.append(key, value))
-
-        const res = await axios.post(baseUrl.href, params.toString(), {
+        const res = await axios.post('https://oauth2.googleapis.com/token', {
+            grant_type,
+            redirect_uri: "http://localhost:5000/auth/google",
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            ...options
+        }, {
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
         })
 
-        console.log(res.data)
-
         return res.data
     } catch (err) {
-        console.log(err.message)
+        console.log(err)
 
         return null
+    }
+}
+
+module.exports.getUser = async ({ session }) => {
+    try {
+        const user = jwt.decode(session?.id_token)
+
+        return user
+    } catch (error) {
+        throw error
     }
 }
