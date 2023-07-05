@@ -1,42 +1,44 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const schema = new mongoose.Schema({
+const schema = new mongoose.Schema(
+  {
     code: {
-        type: String,
-        required: true,
-        minLength: 5,
+      type: String,
+      required: true,
+      minLength: 5,
     },
     status: {
-        type: String,
-        enum: ['success', 'pending', 'failed']
+      type: String,
+      enum: ["success", "pending", "failed"],
     },
     lang: {
-        type: String,
-        required: true,
-        enum: ['java', 'cpp', 'python']
+      type: String,
+      required: true,
+      enum: ["java", "cpp", "python"],
     },
     output: {
-        stdout: {
-            type: String,
-        },
-        stderr: {
-            type: String,
-        }
+      stdout: {
+        type: String,
+      },
+      stderr: {
+        type: String,
+      },
     },
     error: {
-        stack: {
-            type: String,
-        },
-        message: {
-            type: String,
-        }
+      stack: {
+        type: String,
+      },
+      message: {
+        type: String,
+      },
     },
     input: {
-        type: String
-    }
-}, {
+      type: String,
+    },
+  },
+  {
     timestamps: true,
-})
+  }
+);
 
-
-module.exports = mongoose.model('Job', schema)
+module.exports = mongoose.model("Job", schema);

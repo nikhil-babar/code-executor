@@ -1,6 +1,6 @@
 FROM node:latest
 
-RUN apt-get update && apt-get install -y openjdk-11-jdk
+RUN apt-get update && apt-get install -y eclipse-temurin:17-jdk-jammy
 
 RUN apt-get update && apt-get install -y python3 python3-pip
 

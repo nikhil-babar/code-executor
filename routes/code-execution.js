@@ -1,71 +1,65 @@
-const router = require('express').Router()
-const Job = require('../models/Job')
-const mongoose = require('mongoose')
-const Queue = require('../JobScheduler')
-require('dotenv').config()
+const router = require("express").Router();
+const Job = require("../models/Job");
+const mongoose = require("mongoose");
+const Queue = require("../JobScheduler");
+require("dotenv").config();
 
-router.post('/', async (req, res) => {
-    try {
-        const { lang, code, input } = req.body
+router.post("/", async (req, res) => {
+  try {
+    const { lang, code, input } = req.body;
 
-        const job = new Job({
-            lang,
-            code,
-            input,
-            status: 'pending',
-        })
-        await job.save()
+    const job = new Job({
+      lang,
+      code,
+      input,
+      status: "pending",
+    });
+    await job.save();
 
-        res.status(201).json(job)
+    res.status(201).json(job);
 
-        let jobtype = ''
+    let jobtype = "";
 
-        switch (lang) {
-            case 'java':
-            case 'cpp':
-            case 'c':
-                jobtype = 'compiled_language'
-                break;
+    switch (lang) {
+      case "java":
+      case "cpp":
+      case "c":
+        jobtype = "compiled_language";
+        break;
 
-            default:
-                jobtype = 'interpreted_language'
-                break;
-        }
-
-        console.log(jobtype, code, input, lang)
-
-        Queue.add(jobtype, job)
-
-    } catch (error) {
-        console.log(error.message)
-
-        if (error instanceof mongoose.Error) {
-            res.sendStatus(422)
-        } else {
-            res.sendStatus(500)
-        }
+      default:
+        jobtype = "interpreted_language";
+        break;
     }
-})
 
-router.get('/', async (req, res) => {
-    try {
-        const { id } = req.query
-
-        if (!id) return res.sendStatus(422)
-
-        const job = await Job.findById(id)
-
-        if (!job || job.status === 'pending') {
-            return res.sendStatus(404)
-        }
-
-        res.status(200).json(job)
-
-        job.delete()
-
-    } catch (error) {
-        res.sendStatus(500)
+    Queue.add(jobtype, job);
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      res.sendStatus(422);
+    } else {
+      res.sendStatus(500);
     }
-})
+  }
+});
 
-module.exports = router
+router.get("/", async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    if (!id) return res.sendStatus(422);
+
+    const job = await Job.findById(id);
+
+    if (!job || job.status === "pending") {
+      return res.sendStatus(404);
+    }
+
+    res.status(200).json(job);
+
+    job.delete();
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+module.exports = router;

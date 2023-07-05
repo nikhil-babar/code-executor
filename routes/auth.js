@@ -1,23 +1,42 @@
-const router = require('express').Router();
-const authMiddleware = require('../middleware/auth.middleware');
-require('dotenv').config()
+const router = require("express").Router();
+const authMiddleware = require("../middleware/auth.middleware");
+require("dotenv").config();
 
-router.get('/google', (req, res, next) => authMiddleware.googleAuth(req, res, next, { grant_type: 'code' }), async (req, res) => {
+router.get(
+  "/google",
+  (req, res, next) =>
+    authMiddleware.googleAuth(req, res, next, { grant_type: "code" }),
+  async (_req, res) => {
     try {
-        res.redirect('/auth/getAuthStatus')
+      res.redirect("http://localhost:3000");
     } catch (error) {
-        res.sendStatus(500)
+      res.sendStatus(500);
     }
-})
+  }
+);
 
-router.get('/github', (req, res, next) => authMiddleware.githubAuth(req, res, next, { grant_type: 'code' }), async (req, res) => {
+router.get(
+  "/github",
+  (req, res, next) =>
+    authMiddleware.githubAuth(req, res, next, { grant_type: "code" }),
+  async (_req, res) => {
     try {
-        res.redirect('/auth/getAuthStatus')
+      res.redirect("http://localhost:3000");
     } catch (error) {
-        res.sendStatus(500)
+      res.sendStatus(500);
     }
-})
+  }
+);
 
-router.get('/getAuthStatus', (req, res, next) => authMiddleware.githubAuth(req, res, next, { grant_type: 'refresh_token' }), (_req, res) => res.sendStatus(200))
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (!err) {
+      res.clearCookie("connect.sid");
+      return res.sendStatus(200);
+    } else {
+      return res.sendStatus(404);
+    }
+  });
+});
 
-module.exports = router
+module.exports = router;
